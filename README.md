@@ -13,7 +13,11 @@ Download and install the Cloud Foundry Command Line Interface (CF CLI): [Downloa
 
 2) Register a free account on the [Cloud Foundry public cloud](http://run.pivotal.io/) of Pivotal called PWS (**P**ivotal **W**eb **S**ervices)
 
-2) *Optional* install and configure Java 7 (or later) https://java.com/en/download
+or
+
+download a copy of [PCFDev](https://pcfdev.io) which is a shrunk down version of PCF running on your laptop!
+
+3) *Optional* install and configure Java 7 (or later) https://java.com/en/download
 
 ## Deploy the application to Cloud Foundry
 #### Option A - Clone from a github repository and build the artifact manually
@@ -32,7 +36,7 @@ If you don't have Git installed, you can download a zip file of the app at https
 #### Option B - Download the prebuilt artifact
 B-1) [Download](https://s3.eu-central-1.amazonaws.com/pnagel/workshop/spring-music.zip) the zip file and extract it. Then navigate to the App directory `cd ./spring-music`.
 
-#### Push die application to Cloud Foundry
+#### Push the application to Cloud Foundry
 1) Login to [Pivotal Web Services](http://run.pivotal.io/) with the credentials given
 
 ```bash
@@ -42,9 +46,20 @@ Email>     user
 Password>  pass
 ```
 
+**Hint** We’ll use PWS in this guide as we move on. If you chose to use PCFDev, please login with 
+
+```bash
+$ cf login -a https://api.local.pcfdev.io --skip-ssl-validation
+API endpoint:  api.local.pcfdev.io  
+Email>     user
+Password>  pass
+```
+
+Some plans in the PCFDev marketplace might be named differently compared with PWS. Please adjust accordingly.
+
 2) Push the application
 
-Please give the app a name to identify it later on. E.g. *spring-music-pna* whereas *pna* is derived from **P**atrik **Na**gel. Replace *my_app_name* below accordingly, please.
+Please give the app a name to identify it later on e.g. *spring-music*
 
 ```bash
 $ cf push my_app_name
@@ -55,7 +70,7 @@ $ cf push my_app_name
 requested state: started
 instances: 1/1
 usage: 1G x 1 instances
-urls: spring-music-pna-germproof-obedience.cfapps.io
+urls: spring-music-germproof-obedience.cfapps.io
 
      state     since                    cpu    memory         disk           details
 #0   running   2016-07-10 09:49:06 AM   0.0%   426.7M of 1G   155.3M of 1G
@@ -63,7 +78,7 @@ urls: spring-music-pna-germproof-obedience.cfapps.io
 
 Congratulations! You have successfully pushed your first application to Pivotal Cloud Foundry!
 
-**Hint:** If you're wondering how the runtime to execute the Java app (Spring MVC) got built for you, have a look at the concept of [buildpacks](http://docs.pivotal.io/pivotalcf/1-7/buildpacks/index.html). More specifically, the [Java buildpack](https://github.com/cloudfoundry/java-buildpack). Cloud Foundry being a polyglot application platform (Java, node.js. ruby, php, go, python, etc.), you could also push a [docker image](http://docs.pivotal.io/pivotalcf/1-7/concepts/docker.html#push-docker).
+**Hint:** If you're wondering how the runtime to execute the Java app (Spring MVC) got built for you, have a look at the concept of [buildpacks](http://docs.pivotal.io/pivotalcf/1-7/buildpacks/index.html). More specifically, the [Java buildpack](https://github.com/cloudfoundry/java-buildpack). Cloud Foundry being a polyglot application platform (Java, node.js. ruby, php, go, python, etc.), you could also push a [docker image](http://docs.pivotal.io/pivotalcf/1-7/concepts/docker.html#push-docker) (not available on PWS due to security reasons) or a .NET application.
 
 ## Scaling the app
 
@@ -74,13 +89,13 @@ Scaling your app horizontally adds or removes app instances. Adding more instanc
 Increase the number of app instances from one to two:
 
 ```bash
-$ cf scale spring-music-pna -i 2
+$ cf scale spring-music -i 2
 ```
 
 Check the status of the app and verify there are two instances running:
 
 ```bash
-$ cf app spring-music-pna
+$ cf app spring-music
 ...
 state       since                  cpu  memory
 #0 running  2016-02-23 10:55:08 AM 0.1% 461M of 512M
@@ -101,7 +116,7 @@ Open your application in a web browser again (be sure to replace `something` wit
 http://spring-music-something.cfapps.io/errors/kill
 ```
 
-and you will see (`cf app spring-music-pna`) one application instance being restarted by the Elastic Runtime automatically. As you have two instances by now, the `http://spring-music-something.cfapps.io` (again, be sure to replace `something` with your random route) will still return your application as the traffic is only routed to healthy instances.
+and you will see (`cf app spring-music`) one application instance being restarted by the Elastic Runtime automatically. As you have two instances by now, the `http://spring-music-something.cfapps.io` (again, be sure to replace `something` with your random route) will still return your application as the traffic is only routed to healthy instances.
 
 ## Application Logging
 
@@ -110,13 +125,13 @@ PCF provides access to an aggregated view of logs related to you application. Th
 To view your recent logs use
 
 ```bash
-$ cf logs spring-music-pna --recent
+$ cf logs spring-music --recent
 ```
 
 or to get the live stream use
 
 ```bash
-$ cf logs spring-music-pna
+$ cf logs spring-music
 ```
 
 Reload the app page to see activity. Press `control-c` to stop streaming.
@@ -124,7 +139,7 @@ Reload the app page to see activity. Press `control-c` to stop streaming.
 **Hint:** More on logs can be found at [Streaming Logs](http://docs.pivotal.io/pivotalcf/1-7/devguide/deploy-apps/streaming-logs.html)
 
 ## Application Monitoring
-Besides the integrated health monitoring, the platform provides an agentless app monitoring for container metrics as well as latency, number of requests, etc. You can access the latest version (beta) of Pivotal CF Metrics under https://metrics-new.run.pivotal.io (requires authentication with the same user you logged-in via CF CLI). Enter your application name in the search box e.g. spring-music-pna. Explore the current capabilities. Please note that you might need to access the app again to see metrics (ca. 3s delay).
+Besides the integrated health monitoring, the platform provides an agentless app monitoring for container metrics as well as latency, number of requests, etc. You can access the latest version (beta) of Pivotal CF Metrics under https://metrics-new.run.pivotal.io (requires authentication with the same user you logged-in via CF CLI). Enter your application name in the search box e.g. spring-music. Explore the current capabilities. Please note that you might need to access the app again to see metrics (ca. 3s delay).
 
 ## Marketplace and Services
 
@@ -148,16 +163,16 @@ As we want to use a MySQL database, let’s display which plans are available.
 $ cf marketplace -s cleardb
 ```
 
-We’ll create a service using the **free** plan for MySQL. Please use free plans only :) Again, provide a unique identifier for the service instance name (e.g. *mysql-db-pna*). 
+We’ll create a service using the **free** plan for MySQL. Please use free plans only :) Again, provide a unique identifier for the service instance name (e.g. *mysql-db*). 
 
 ```bash
-$ cf create-service cleardb spark mysql-db-pna
+$ cf create-service cleardb spark mysql-db
 ```
 
 To make the credentials available to the application we pushed, we need to bind this service to the application. This injects the credentials and connection information into the app via environment variables.
 
 ```bash
-$ cf bind-service spring-music-pna mysql-db-pna
+$ cf bind-service spring-music mysql-db
 ```
 
 Once bound to the app, environment variables are stored that allow the app to connect to the service after a push, restage or restart command.
@@ -165,7 +180,7 @@ Once bound to the app, environment variables are stored that allow the app to co
 Let’s restart the app.
 
 ```bash
-$ cf restart spring-music-pna
+$ cf restart spring-music
 ```
 
 To verify the new service is bound to the app, you can either click on the info icon in the upper right corner of the app or check using this command:
@@ -175,7 +190,7 @@ $ cf services
 Getting services in org your-org / space development ...
 OK
 name             service   plan    bound apps
-mysql-db-pna     cleardb   spark   spring-music-pna
+mysql-db     cleardb   spark   spring-music
 ```
 
 **Hint:** More on services can be found at [Managing Services](http://docs.pivotal.io/pivotalcf/1-7/devguide/services/managing-services.html). Please note that the marketplace is extensible by your own services.
